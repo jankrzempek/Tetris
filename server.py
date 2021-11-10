@@ -33,8 +33,7 @@ MAX_HIGHSCORES = 10
 class GameServer:
     """Network Game Server."""
 
-    def __init__(self, level, timeout, seed=0, grading=None):
-        self.seed = seed
+    def __init__(self, level, timeout, grading=None):
         self.game = Game()
         self.players = asyncio.Queue()
         self.viewers = set()
@@ -95,9 +94,8 @@ class GameServer:
                     if path == "/viewer":
                         logger.info("Viewer connected")
                         self.viewers.add(websocket)
-
-                    game_info = self.game.info()
-                    await websocket.send(json.dumps(game_info))
+                        game_info = self.game.info()
+                        await websocket.send(json.dumps(game_info))
 
                 if data["cmd"] == "key" and self.current_player.ws == websocket:
                     logger.debug((self.current_player.name, data))
@@ -123,9 +121,6 @@ class GameServer:
 
             try:
                 logger.info("Starting game for <%s>", self.current_player.name)
-                if self.seed > 0:
-                    random.seed(self.seed)
-
                 self.game = Game()
 
                 game_info = await self.game.loop()
@@ -149,6 +144,7 @@ class GameServer:
                 self.save_highscores(self.game.score)
 
                 game_info = self.game.info()
+                game_info["score"] = self.game.score
                 game_info["player"] = self.current_player.name
 
                 await self.send_info(game_info, highscores=True)
@@ -183,7 +179,10 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    g = GameServer(0, -1, args.seed, args.grading_server)
+    if args.seed > 0:
+        random.seed(args.seed)
+
+    g = GameServer(0, -1, args.grading_server)
 
     game_loop_task = asyncio.ensure_future(g.mainloop())
 
