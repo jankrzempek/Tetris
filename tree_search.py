@@ -99,10 +99,10 @@ class SearchTree:
             node = self.all_nodes[nodeID]
             if self.problem.goal_test(node.state):
                 self.solution = node
-                self.terminal = len(self.open_nodes)+1
+                self.terminals = len(self.open_nodes)+1
                 return self.get_path(node)
             lnewnodes = []
-            self.non_terminal += 1
+            self.non_terminals += 1
             for a in self.problem.domain.actions(node.state):
                 newstate = self.problem.domain.result(node.state,a)
                 if newstate not in self.get_path(node):
