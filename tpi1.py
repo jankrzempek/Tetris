@@ -22,7 +22,7 @@ class MyTree(SearchTree):
         #IMPLEMENT HERE
         pass
 
-    def repeated_random_depth(self,maxattempts=3,atmostonce=False):
+    def repeated_random_depth(self,numattempts=3,atmostonce=False):
         #IMPLEMENT HERE
         pass
 
