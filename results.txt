@@ -32,9 +32,9 @@
 13 6
 ['Braga', 'Porto', 'Agueda', 'Coimbra', 'Leiria', 'Santarem', 'Evora', 'Beja', 'Faro']
 570.0614002017677
-739
+706
 570.0614002017677
-16 3
+17 2
 
 -- ## Ex. 6 --------------------------------
 ['Braga', 'Porto', 'Agueda', 'Aveiro', 'Coimbra', 'Leiria', 'Castelo Branco', 'Santarem', 'Lisboa', 'Evora', 'Beja', 'Faro']
