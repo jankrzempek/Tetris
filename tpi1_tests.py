@@ -83,7 +83,7 @@ print("\n-- ## Ex. 3 --------------------------------")
 
 t = MyTree(p,'rand_depth')
 print(t.repeated_random_depth(8))
-print(t.all_nodes[0].heuristic,t.solution_tree.solution.cost)
+print(t.solution_tree.solution.cost)
 print(t.solution_tree.non_terminals, t.solution_tree.terminals)
 
 print("\n-- ## Ex. 4 --------------------------------")
@@ -104,15 +104,15 @@ print(t.non_terminals,t.terminals)
 
 print("\n-- ## Ex. 5 --------------------------------")
 
-t = MyTree(p,'depth',True)
-print(t.search2())
+t = MyTree(p,'depth')
+print(t.search2(True))
 print(t.all_nodes[0].heuristic)
 print(t.solution.cost)
 print(t.all_nodes[0].eval)
 print(t.non_terminals,t.terminals)
 
-t = MyTree(p,'A*',True)
-print(t.search2())
+t = MyTree(p,'A*')
+print(t.search2(True))
 print(t.all_nodes[0].heuristic)
 print(t.solution.cost)
 print(t.all_nodes[0].eval)

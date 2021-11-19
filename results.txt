@@ -9,7 +9,7 @@
 
 -- ## Ex. 3 --------------------------------
 ['Braga', 'Guimaraes', 'Porto', 'Aveiro', 'Coimbra', 'Figueira', 'Leiria', 'Santarem', 'Evora', 'Lisboa', 'Beja', 'Faro']
-570.0614002017677 983
+983
 11 15
 
 -- ## Ex. 4 --------------------------------
@@ -25,16 +25,16 @@
 84 160
 
 -- ## Ex. 5 --------------------------------
-['Braga', 'Porto', 'Agueda', 'Aveiro', 'Coimbra', 'Leiria', 'Castelo Branco', 'Santarem', 'Lisboa', 'Evora', 'Beja', 'Faro']
+['Braga', 'Porto', 'Agueda', 'Coimbra', 'Leiria', 'Castelo Branco', 'Portalegre', 'Evora', 'Beja', 'Faro']
 570.0614002017677
-1104
+933
 570.0614002017677
-11 19
+13 6
 ['Braga', 'Porto', 'Agueda', 'Coimbra', 'Leiria', 'Santarem', 'Evora', 'Beja', 'Faro']
 570.0614002017677
-706
+739
 570.0614002017677
-84 160
+16 3
 
 -- ## Ex. 6 --------------------------------
 ['Braga', 'Porto', 'Agueda', 'Aveiro', 'Coimbra', 'Leiria', 'Castelo Branco', 'Santarem', 'Lisboa', 'Evora', 'Beja', 'Faro']
