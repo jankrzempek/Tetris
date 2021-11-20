@@ -108,7 +108,7 @@ class SearchTree:
                 if newstate not in self.get_path(node):
                     newnode = SearchNode(newstate,nodeID)
                     self.all_nodes.append(newnode)
-                    lnewnodes.append(len(self.all_nodes))
+                    lnewnodes.append(len(self.all_nodes)-1)
             self.add_to_open(lnewnodes)
         return None
 
