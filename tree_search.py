@@ -127,3 +127,19 @@ class SearchTree:
         elif self.strategy == 'A*':
             self.astar_add_to_open(lnewnodes)
 
+    # shows the search tree in the form of a listing
+    def show(self,showcost=False,nodeID=None,indent=''):
+        if nodeID==None:
+            self.show(showcost,0)
+            print('\n')
+        else:
+            node = self.all_nodes[nodeID]
+            line = indent+"["+str(nodeID)+"] "+node.state
+            if showcost:
+                line += (' [' + str(node.cost) + ']')
+            print(line)
+            if node.children==None:
+                return
+            for c in node.children:
+                self.show(showcost,c,indent+'  ')
+
