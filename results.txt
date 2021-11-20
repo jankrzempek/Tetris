@@ -16,12 +16,12 @@
 ['Braga', 'Porto', 'Agueda', 'Aveiro', 'Coimbra', 'Leiria', 'Castelo Branco', 'Santarem', 'Lisboa', 'Evora', 'Beja', 'Faro']
 570.0614002017677
 1104
-577.1784131963146
+577
 11 19
 ['Braga', 'Porto', 'Agueda', 'Coimbra', 'Leiria', 'Santarem', 'Evora', 'Beja', 'Faro']
 570.0614002017677
 706
-705.5343775943672
+706
 84 160
 
 -- ## Ex. 5 --------------------------------
