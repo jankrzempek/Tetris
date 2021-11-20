@@ -1,4 +1,5 @@
 
+
 #import math
 
 from tpi1 import *
@@ -66,6 +67,7 @@ cidades_portugal = MyCities(
                        'Portalegre': (130,170) }
                      )
 
+
 p = SearchProblem(cidades_portugal,'Braga','Faro')
 
 print("\n-- ## Ex. 1 --------------------------------")
@@ -108,14 +110,14 @@ t = MyTree(p,'depth')
 print(t.search2(True))
 print(t.all_nodes[0].heuristic)
 print(t.solution.cost)
-print(t.all_nodes[0].eval)
+#print(t.all_nodes[0].eval)
 print(t.non_terminals,t.terminals)
 
 t = MyTree(p,'A*')
 print(t.search2(True))
 print(t.all_nodes[0].heuristic)
 print(t.solution.cost)
-print(t.all_nodes[0].eval)
+#print(t.all_nodes[0].eval)
 print(t.non_terminals,t.terminals)
 
 print("\n-- ## Ex. 6 --------------------------------")
