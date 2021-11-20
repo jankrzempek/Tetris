@@ -28,12 +28,10 @@
 ['Braga', 'Porto', 'Agueda', 'Coimbra', 'Leiria', 'Castelo Branco', 'Portalegre', 'Evora', 'Beja', 'Faro']
 570.0614002017677
 933
-577.1784131963146
 13 6
 ['Braga', 'Porto', 'Agueda', 'Coimbra', 'Leiria', 'Santarem', 'Evora', 'Beja', 'Faro']
 570.0614002017677
 706
-642.1176307799994
 17 2
 
 -- ## Ex. 6 --------------------------------
