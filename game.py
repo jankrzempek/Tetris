@@ -10,8 +10,8 @@ from collections import Counter
 logger = logging.getLogger("Game")
 logger.setLevel(logging.DEBUG)
 
-GAME_SPEED = 10
-SPEED_STEP = 10  # points
+GAME_SPEED = 5
+SPEED_STEP = 15  # points
 
 
 class Game:
@@ -30,7 +30,7 @@ class Game:
         self.game = []
         self.score = 0
         self.speed = 1
-        self.game_speed = 10
+        self.game_speed = 5
         self._lastkeypress = None
 
         self.running = True
