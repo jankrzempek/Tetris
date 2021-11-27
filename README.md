@@ -2,7 +2,6 @@
 Projecto de Inteligência Artificial 2021 - Tetris
 
 ## How to install
-
 Make sure you are running Python 3.7 or higher
 
 `$ pip install -r requirements.txt`
@@ -34,3 +33,5 @@ python -m pygame.examples.aliens
 # Tested on:
 - OSX Big Sur 11.6
 
+# ia-2022-tpi-1
+tpi1
