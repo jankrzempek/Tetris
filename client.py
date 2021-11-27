@@ -31,7 +31,7 @@ async def agent_loop(server_address="localhost:8001", agent_name="student"):
                 state = json.loads(
                     await websocket.recv()
                 )
-
+                key = ""
                 for item in state["game"]:
                     if item[1] == 29 and item[0] in array_of_taken:
                         array_of_taken.remove(item[0])
@@ -78,20 +78,18 @@ async def agent_loop(server_address="localhost:8001", agent_name="student"):
                 elif 4 - start_x < 0:
                     key = "d"
 
-                # if times > 0:
-                #     key = "a"
-                # elif times < 0:
-                #     key = "d"
+
                 times = abs(4 - start_x)
                 print("times ", times)
                 # + times - go left
                 # - times - go right
 
-                for i in range(1):
-                    print("DUPAAA", i)
-                    await websocket.send(
-                        json.dumps({"cmd": "key", "key": key})
-                    )
+                # for i in range(1):
+                #     print("DUPAAA", i)
+                await websocket.send(
+                    json.dumps({"cmd": "key", "key": key})
+                )
+                continue
                 key = ""
 
             except websockets.exceptions.ConnectionClosedOK:
@@ -99,13 +97,6 @@ async def agent_loop(server_address="localhost:8001", agent_name="student"):
                 return
 
             pygame.display.flip()
-
-
-
-
-
-
-
 
 
 # DO NOT CHANGE THE LINES BELLOW
