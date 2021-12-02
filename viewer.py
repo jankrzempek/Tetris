@@ -190,7 +190,7 @@ async def main_loop(queue):
 
 if __name__ == "__main__":
     SERVER = os.environ.get("SERVER", "localhost")
-    PORT = os.environ.get("PORT", "8001")
+    PORT = os.environ.get("PORT", "8000")
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--server", help="IP address of the server", default=SERVER)

@@ -20,7 +20,7 @@ program_icon = pygame.image.load("data/icon2.png")
 pygame.display.set_icon(program_icon)
 
 
-async def agent_loop(server_address="localhost:8001", agent_name="student"):
+async def agent_loop(server_address="localhost:8000", agent_name="student"):
     async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
         # Receive information about static game properties
@@ -44,7 +44,7 @@ async def agent_loop(server_address="localhost:8001", agent_name="student"):
 
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})
-                ) 
+                )
 
             except websockets.exceptions.ConnectionClosedOK:
                 print("Server has cleanly disconnected us")
@@ -57,6 +57,6 @@ async def agent_loop(server_address="localhost:8001", agent_name="student"):
 # $ NAME='arrumador' python3 client.py
 loop = asyncio.get_event_loop()
 SERVER = os.environ.get("SERVER", "localhost")
-PORT = os.environ.get("PORT", "8001")
+PORT = os.environ.get("PORT", "8000")
 NAME = os.environ.get("NAME", getpass.getuser())
 loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))

@@ -15,8 +15,24 @@ class Agent:
     def __init__(self, websocket):
         self.websocket = websocket
 
+    def coordinates(self, piece):
+        print("uwaga: ", piece)
+        x_min = 100
+        y_min = 100
+        x = 0
+        y = 0
+        new_piece = []
+        x_min = min(piece, key=lambda item: item[1])[0]
+        y_min = max(piece, key=lambda item: item[1])[1]
+        for coordinate in piece:
+            x = coordinate[0] - x_min
+            y = coordinate[1] - y_min
+            new_piece.append([x, y])
+        return new_piece
+
+
     async def play(self, state):
-        
+
         # Parametry
         self.key = ""
         minu_y = 0
@@ -57,7 +73,7 @@ class Agent:
                     len_counter = 1
                 elif item[1] == minu_y:
                     len_counter += 1
-        
+
         #  # Zerowanie wartości zajętych na dole przez klocki
         # if self.piece_current != len(state["game"]):
         #     tablica = state["game"]
@@ -67,7 +83,7 @@ class Agent:
         #             self.array_of_taken[items[0] - 1] = 0
         #     self.piece_current += 4
 
-        # Szukanie dziur i zapisywanie do tablicy 
+        # Szukanie dziur i zapisywanie do tablicy
         l_holes_array = []
         l_holes_position = []
         for i in range(len(self.array_of_taken)-1):
@@ -94,7 +110,7 @@ class Agent:
             self.keys.remove(self.key)
             print(self.keys)
         return self.key
-    
+
 
 
 
@@ -115,7 +131,7 @@ class Agent:
                             local_min = item[1]
                 black_line.append([line, local_min])
             black_line.append([9, y_threshold])
-            # Making full line using them 
+            # Making full line using them
             ## current y value - next y value = ?? sum
             ## sum < 0: Go down
             ## sum == 0: nothing, just next piece
@@ -146,7 +162,7 @@ class Agent:
             for i in reversed(range(31)):
                 black_line.append([9, i])
         return black_line
-                
+
 
     def decision_function(self, piece, game, black_line):
         '''
@@ -166,64 +182,82 @@ class Agent:
         dodajemy do tablicy punkty i liste kluczy: jezelu 4-x > 0 to tyle razy w prawo jezeli < 0 to tyle razy w lewo jezeli nic to w dół
         '''
         tablica = []
-        # lecimy po kolei wspolrzedne x
-        for x in range(1, 8):
-            print(x)
-            y_max= 30
-            points = 0
-            new_piece = []
-            for item in black_line:
-                if item[0] == x and y_max >= item[1]:
-                    y_max = item[1]-2
-                    print(x, y_max, "wlazlem")
-            # tu mamy najlizszy pkt y dla wybranego x
-            # jak przesunac - znalesc najdalej wysuniety x jezeli x > 4 to przesuwamy w prawo x <
-            o_ile_przesuwamy = x-3
-            for coordinate in piece:
-                print(coordinate, " halkoooooooo")
-                new_piece.append([coordinate[0]+o_ile_przesuwamy, y_max - (4 - coordinate[1])])
-                if [coordinate[0]+o_ile_przesuwamy, coordinate[1]+(y_max - coordinate[1])] in game:
+        if piece is not None:
+            # lecimy po kolei wspolrzedne x
+            for x in range(1, 8):
+                print(x)
+                y_max= 30
+                points = 0
+                new_piece = []
+                x_min = min(piece, key=lambda item: item[1])[0]
+                for item in black_line:
+                    if item[0] == x and y_max >= item[1]:
+                        y_max = item[1]-2
+                        print(x, y_max, "wlazlem")
+                # tu mamy najlizszy pkt y dla wybranego x
+                # jak przesunac - znalesc najdalej wysuniety x jezeli x > 4 to przesuwamy w prawo x <
+                y_thre = max(piece, key=lambda item:item[1])[1]
+
+                # for coordinate in piece:
+                #     print(coordinate, " halkoooooooo")
+
+                #     if [coordinate[0]+o_ile_przesuwamy, coordinate[1]+ o_ile_przes_y] in game:
+                #         # to znaczy ze na któryms z miejsc jest juz inny klocek wiec 0 pkt i 0 przesuniec
+                #         tablica.append([0,['']])
+                #         break  # przerywamy wyznaczanie dla tego x
+
+                #     new_piece.append([coordinate[0]+o_ile_przesuwamy, coordinate[1] + o_ile_przes_y])
+                print(piece)
+                basic_piece = self.coordinates(piece)
+                new_x, new_y = 0, 0
+                for coordinate in basic_piece:
+                    new_x = coordinate[0] + x
+                    new_y = coordinate[1] + y_max
+                    if [new_x, new_y] in game:
                     # to znaczy ze na któryms z miejsc jest juz inny klocek wiec 0 pkt i 0 przesuniec
-                    tablica.append([0,0])
-                    break  # przerywamy wyznaczanie dla tego x
+                        tablica.append([0, ['']])
+                        break  # przerywamy wyznaczanie dla tego x
+                    new_piece.append([new_x, new_y])
 
-            # wyznaczamy punkty
-            for coordinate in new_piece:
-                print(coordinate, "nowe koordynaty")
-                if ([coordinate[0]+1, coordinate[1]] not in black_line) and ([coordinate[0], coordinate[1]+1] not in black_line) and ([coordinate[0]-1, coordinate[1]] not in black_line):
-                    points += 1
-                #     print("mam 3 pkt")
-                if ([coordinate[0]+1, coordinate[1]] in black_line):
-                    points += 3
-                    print("mam 3 pkt za: ", [coordinate[0]+1, coordinate[1]])
-                if ([coordinate[0], coordinate[1]+1] in black_line):
-                    points += 3
-                    print("mam 3 pkt za: ", [coordinate[0], coordinate[1]+1])
-                if ([coordinate[0]-1, coordinate[1]] in black_line):
-                    points += 3
-                    print("mam 3 pkt za: ", [coordinate[0]-1, coordinate[1]])
-                # else:
-                #     points += 1
+                # wyznaczamy punkty
+                for coordinate in new_piece:
+                    print(coordinate, "nowe koordynaty")
+                    if ([coordinate[0]+1, coordinate[1]] not in black_line) and ([coordinate[0], coordinate[1]+1] not in black_line) and ([coordinate[0]-1, coordinate[1]] not in black_line):
+                        points += 1
+                    #     print("mam 3 pkt")
+                    if ([coordinate[0]+1, coordinate[1]] in black_line):
+                        points += 3
+                        print("mam 3 pkt za: ", [coordinate[0]+1, coordinate[1]])
+                    if ([coordinate[0], coordinate[1]+1] in black_line):
+                        points += 3
+                        print("mam 3 pkt za: ", [coordinate[0], coordinate[1]+1])
+                    if ([coordinate[0]-1, coordinate[1]] in black_line):
+                        points += 3
+                        print("mam 3 pkt za: ", [coordinate[0]-1, coordinate[1]])
+                    # else:
+                    #     points += 1
 
-            print("punkty: ", points)
-            # wyznaczamy przeduniecie
-            keys = []
-            ile = 4 - x
-            print("ile roznicy: ", ile)
-            if ile > 0:
-                print("dodaje")
-                for i in range(ile):
-                    keys.append("a")
-                print(keys)
-            elif ile < 0:
-                print("dodaje")
-                for i in range(abs(ile)):
-                    keys.append("d")
-                print(keys)
-           
-            # dodawanie do tablicy
-            tablica.append([points, keys])
-            print(tablica)
-        sorted_table = sorted(tablica, reverse=True)
-        print(sorted_table)
-        return sorted_table[0][1]
+                print("punkty: ", points)
+                # wyznaczamy przeduniecie
+                keys = []
+                print()
+                ile = abs(x - x_min)
+                print("ile roznicy: ", ile)
+                if x < x_min:
+                    print("dodaje w lewo")
+                    for i in range(ile):
+                        keys.append("a")
+                    print(keys)
+                elif x > x_min:
+                    print("dodaje")
+                    for i in range(abs(ile)):
+                        keys.append("d")
+                    print(keys)
+
+                # dodawanie do tablicy
+                tablica.append([points, keys])
+                print(tablica)
+            sorted_table = sorted(tablica, reverse=True)
+            print(sorted_table)
+            return sorted_table[0][1]
+        return []
