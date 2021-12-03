@@ -2,8 +2,6 @@
 Projecto de Inteligência Artificial 2021 - Tetris
 
 ## How to install
-<<<<<<< HEAD
-=======
 Make sure you are running Python 3.7 or higher
 
 `$ pip install -r requirements.txt`
@@ -53,7 +51,6 @@ git merge --allow-unrelated-histories upstream/master
 Projecto de Inteligência Artificial 2021 - Tetris
 
 ## How to install
->>>>>>> 91cf16f1bd1028278648a1588e1c115752369364
 
 Make sure you are running Python 3.7 or higher
 
