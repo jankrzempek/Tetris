@@ -27,7 +27,7 @@ def indicate_black_line(state):
     if state["game"]:
         y_threshold = min(state["game"], key=lambda item: item[1])[1]
         array_of_game_and_floor = state["game"] + floor
-        black_line.append([0, y_threshold])
+        # black_line.append([0, y_threshold])
         # Collecting spiky point for every line
         for line in range(1, 9):
             local_min = 100
@@ -36,7 +36,7 @@ def indicate_black_line(state):
                     if item[1] < local_min:
                         local_min = item[1]
             black_line.append([line, local_min])
-        black_line.append([9, y_threshold])
+        # black_line.append([9, y_threshold])
         # Making full line using them
         ## current y value - next y value = ?? sum
         ## sum < 0: Go down
@@ -98,7 +98,7 @@ def coordinates(piece):
     return new_piece
 
 
-def new_coordinates(piece, game, x, tablica, new_piece, y_min):
+def new_coordinates(piece, game, x, tablica, new_piece, y_min, black_line):
     if game:
         new_x, new_y = 0, 0
         tablica_x = [x[0] for x in piece]
@@ -121,7 +121,7 @@ def new_coordinates(piece, game, x, tablica, new_piece, y_min):
             tablica_x_z_game.append(y_thre)
         y_minimalne = min(tablica_x_z_game, key=lambda cos: cos[1])[1]
         # y_minimalne -= 1
-        print("najnizszy pkt: ", y_minimalne)
+        print("najwyzszy pkt z dysponowanych x: ", y_minimalne)
         print("sprawdzamy klocka czy ma 4: ", piece)
         for coordinate in piece:
             # tu musimy sprawdzic wysokosci y
@@ -131,6 +131,7 @@ def new_coordinates(piece, game, x, tablica, new_piece, y_min):
             print("nowe koordynaty które chcemy dodac: ", new_x, new_y)
             if is_empty_line(game, new_x, new_y):
                 print("STATED EMPTY LINE")
+                # to jest tylko do zwrotki koncowej
                 if new_y < y_min:
                     y_min = new_y
                 if new_x > 8 or new_x < 1:
@@ -141,7 +142,8 @@ def new_coordinates(piece, game, x, tablica, new_piece, y_min):
                     ("przesuwamy sie o jeden wyzej bo tu jest zajęte", new_x, new_y)
                     # break  # przerywamy wyznaczanie dla tego x
                     czy_tu_bylo = True
-                    print("TUUUUUUU BYŁOOOOOOOO")
+                if new_y == 30:
+                    czy_tu_bylo = True
                 print("dodajemy wspolrzedne: ", new_x, new_y)
                 # if [new_x, new_y-1] in game:
                 #     czy_pod_nami_pusto = False
@@ -149,21 +151,23 @@ def new_coordinates(piece, game, x, tablica, new_piece, y_min):
             else:
                 tablica.append([0, ['']])
                 break  # przerywamy wyznaczanie dla tego x
+        # jakikolwiek klocek nad nami
         if czy_tu_bylo:
             for c in new_piece:
                 c[1] -= 1
-                print("ZOBACZ CZY ODJALEM Z TABLICY Y -1")
-                print(new_piece)
-                print(new_y)
+                # print("ZOBACZ CZY ODJALEM Z TABLICY Y -1")
+                # print(new_piece)
+                # print(new_y)
+        # pusta przestrzen pod klockiem
         for cyco in new_piece:
-            if [cyco[0], cyco[1]+1] in game:
+            if [cyco[0], cyco[1]+1] in game or [cyco[0], cyco[1]+1] in black_line:
                 czy_pod_nami_pusto = False
         if czy_pod_nami_pusto:
             for c in new_piece:
                 c[1] += 1
-                print("ZOBACZ CZY ODJALEM Z TABLICY Y +1")
-                print(new_piece)
-                print(new_y)
+                # print("ZOBACZ CZY ODJALEM Z TABLICY Y +1")
+                # print(new_piece)
+                # print(new_y)
     return tablica, new_piece, y_min
 
 
@@ -190,11 +194,11 @@ def decision_function(piece, game, black_line, blue_line):
         for x in range(1, 8):
             print("-------------------> ## DECISION: ", x, "\n")
             y_min = 100
-            y_max = 30
+            y_max = 29
             points = 0
             new_piece = []
             x_min = min(piece, key=lambda item: item[0])[0]
-            print("min : ", x_min)
+            # print("min : ", x_min)
             # tu mamy najlizszy pkt y dla wybranego x
             # jak przesunac - znalesc najdalej wysuniety x jezeli x > 4 to przesuwamy w prawo x <
             y_thre = max(piece, key=lambda item: item[1])[1]
@@ -202,7 +206,7 @@ def decision_function(piece, game, black_line, blue_line):
             print("KLOCEK w 0;0 :", basic_piece, "\n")
 
 
-            tablica, new_piece, y_min = new_coordinates(basic_piece, game, x, tablica, new_piece, y_min)
+            tablica, new_piece, y_min = new_coordinates(basic_piece, game, x, tablica, new_piece, y_min, black_line)
             print("NEW_PIECE : ", new_piece, "\n")
             if len(tablica) != x:
                 # wyznaczamy punkty
@@ -210,22 +214,28 @@ def decision_function(piece, game, black_line, blue_line):
                     sasiady = [[coordinate[0]+1, coordinate[1]],
                                 [coordinate[0]-1, coordinate[1]],
                                 [coordinate[0], coordinate[1]+1]]
-                    print("sasiedzi: ", sasiady, "===============================")
                     print("# Punktacja za koordynaty:", coordinate)
                     for s in sasiady:
                         if s in blue_line and s in black_line:
-                            points += 6
+                            points += 6.0
                             print("5 pkt za blue i black line")
                         else:
                             if s in black_line:
-                                points += 6
+                                points += 6.0
                                 print("6 pkt za black line")
                             elif s in blue_line:
-                                points += 3
-                                print("2 pkt za blue line")
+                                points += 4.0
+                                print("4.0 pkt za blue line")
                             else:
-                                points += 1
+                                points += 1.0
                                 print("1 pkt pozostałe")
+                    y_table = [y for y in game if y[1] == coordinate[1]]
+                    for c in new_piece:
+                        if c[1] == coordinate[1]:
+                            y_table.append(c)
+
+                    if len(y_table) == 8:
+                        points += 15
 
                 print("Podsumowanie punktacji: ", points, "\n")
 
@@ -235,12 +245,10 @@ def decision_function(piece, game, black_line, blue_line):
                 if x < x_min:
                     for i in range(ile):
                         keys.append("a")
-                    print(keys)
                 elif x > x_min:
                     for i in range(abs(ile)):
                         keys.append("d")
-                    print(keys)
-
+                print(keys)
                 # dodawanie do tablicy
                 tablica.append([points, keys, y_min])
 
@@ -249,6 +257,7 @@ def decision_function(piece, game, black_line, blue_line):
         for i in range(powtorzenia):
             if sorted_table[0][2] > sorted_table[i][2]:
                 sorted_table.pop(0)
+                print("wywaliłem gorsza opcje XDDDDDDDDDDDDDDDDD =================================")
         print("RUCHY KLOCKA :", sorted_table, "\n")
         return sorted_table[0][1]
     return []
@@ -309,7 +318,6 @@ def play(state, keys, is_new_piece):
 
     if len(keys) != 0:
         key = keys[0]
-        print(key)
         keys.remove(key)
         print(keys)
     return key, keys, is_new_piece
