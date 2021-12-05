@@ -155,12 +155,15 @@ def new_coordinates(piece, game, x, tablica, new_piece, y_min):
                 print("ZOBACZ CZY ODJALEM Z TABLICY Y -1")
                 print(new_piece)
                 print(new_y)
-        # if czy_pod_nami_pusto:
-        #     for c in new_piece:
-        #         c[1] += 1
-        #         print("ZOBACZ CZY ODJALEM Z TABLICY Y -1")
-        #         print(new_piece)
-        #         print(new_y)
+        for cyco in new_piece:
+            if [cyco[0], cyco[1]+1] in game:
+                czy_pod_nami_pusto = False
+        if czy_pod_nami_pusto:
+            for c in new_piece:
+                c[1] += 1
+                print("ZOBACZ CZY ODJALEM Z TABLICY Y +1")
+                print(new_piece)
+                print(new_y)
     return tablica, new_piece, y_min
 
 
