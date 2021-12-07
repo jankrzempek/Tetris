@@ -79,7 +79,6 @@ def indicate_blue_line(state):
 def is_empty_line(game, x, y):
     for coordinate in game:
         if coordinate[0] == x and coordinate[1] < y:
-            print("jest cos wyzej", x, y)
             return False
     return True
 
@@ -98,45 +97,56 @@ def coordinates(piece):
     return new_piece
 
 
-def new_coordinates(piece, game, x, tablica, new_piece, y_min, black_line):
+def new_coordinates(piece, game, x, y_min, black_line, mała_tablica):
+    # po co jest tablica tu
+    print("cokolwiek")
     if game:
         new_x, new_y = 0, 0
-        tablica_x = [x[0] for x in piece]
+        tablica_x = [x[0] for x in piece]  # sprawdzamy szerokosc klocka
         set_x = set(tablica_x)
-        czy_tu_bylo = False
-        y_max_piece = max(piece, key=lambda cos: cos[1])[1]
-        czy_pod_nami_pusto = True
+        czy_tu_bylo = False  # jezeli znajdziemy chociaz jedno pole zajete bedzie true i dodamy pole nad nim
+        y_max_piece = max(piece, key=lambda cos: cos[1])[1]  # najnizszy y z naszego klocka sluzy do wyznaczenia koordynatow
+        czy_pod_nami_pusto = True # sprawdzamy czy przypadkiem pozycja pod nami nie jest pusta
         # 0+x, y ; 1+x, y
         # znalesc najmniejszy z tych y
         tablica_x_z_game = []
-        for item in set_x:
-            tablica_danej_linii = []
-            for element in game:
-                if element[0] == item+x:
-                    tablica_danej_linii.append(element)
-            if tablica_danej_linii:
-                y_thre = min(tablica_danej_linii, key=lambda cos: cos[1])
-            if not tablica_danej_linii:
-                y_thre = [item+x, 30]
-            tablica_x_z_game.append(y_thre)
-        y_minimalne = min(tablica_x_z_game, key=lambda cos: cos[1])[1]
-        # y_minimalne -= 1
-        print("najwyzszy pkt z dysponowanych x: ", y_minimalne)
-        print("sprawdzamy klocka czy ma 4: ", piece)
-        for coordinate in piece:
-            # tu musimy sprawdzic wysokosci y
 
+        for item in set_x:  # dla kazdego x z naszego klocka
+            tablica_danej_linii = []  # wszystkie miejsca zajete pod nami w danej lini dla kazdego x z szerokosci klocka
+
+            for element in game:
+                if element[0] == item+x:  # bo item zaczyna sie od zera i trzeba go przesuwać o x
+                    tablica_danej_linii.append(element)
+
+            if tablica_danej_linii:
+                y_thre = min(tablica_danej_linii, key=lambda cos: cos[1])  # znajdujemy najwyzej zajęte pole dla danego x (danej linii)
+            if not tablica_danej_linii:
+                y_thre = [item+x, 30]  # jezeli go nie ma to pole jest puste i jedziemy na sam dół 30 bo ustawiamy sie jeden wyzej niz zajety klocek
+
+            tablica_x_z_game.append(y_thre) # zajmuje ją lista najwyzej polozonych pkt dla danej pozycji klocka, jego szerokosci
+        y_minimalne = min(tablica_x_z_game, key=lambda cos: cos[1])[1] # znajduje najwyzej polozony pkt - tzw pkt oparcia dla klocka
+        # print("sprawdzamy klocka czy ma 4: ", len(piece))
+        new_piece = []
+
+        for coordinate in piece:
+            print(coordinate, "COOOORODINATE")
+            # tu musimy sprawdzic wysokosci
             new_x = coordinate[0] + x
             new_y = coordinate[1] + (y_minimalne - y_max_piece)
             print("nowe koordynaty które chcemy dodac: ", new_x, new_y)
             if is_empty_line(game, new_x, new_y):
-                print("STATED EMPTY LINE")
-                # to jest tylko do zwrotki koncowej
                 if new_y < y_min:
+                    # to jest tylko do zwrotki koncowej odpowiada za najnizszy y dodawany do tablicy
                     y_min = new_y
+
                 if new_x > 8 or new_x < 1:
-                    tablica.append([0, ['']])
-                    break  # przerywamy wyznaczanie dla tego x
+                    print("WYSZEDŁEM PO ZA TABLICE")
+                    mała_tablica.append([0, ['']])
+                    new_piece = []
+                    y_min = 100
+                    print(mała_tablica)
+                    return mała_tablica, new_piece, y_min  # przerywamy wyznaczanie dla tej pozycji dla danego x wracamy do f głownej
+
                 if [new_x, new_y] in game:
                 # to znaczy ze na któryms z miejsc jest juz inny klocek wiec 0 pkt i 0 przesuniec
                     ("przesuwamy sie o jeden wyzej bo tu jest zajęte", new_x, new_y)
@@ -144,123 +154,75 @@ def new_coordinates(piece, game, x, tablica, new_piece, y_min, black_line):
                     czy_tu_bylo = True
                 if new_y == 30:
                     czy_tu_bylo = True
+
                 print("dodajemy wspolrzedne: ", new_x, new_y)
-                # if [new_x, new_y-1] in game:
-                #     czy_pod_nami_pusto = False
                 new_piece.append([new_x, new_y])
             else:
-                tablica.append([0, ['']])
-                break  # przerywamy wyznaczanie dla tego x
-        # jakikolwiek klocek nad nami
+                mała_tablica.append([0, ['']])
+                new_piece = []
+                y_min = 100
+                print(mała_tablica)
+                return mała_tablica, new_piece, y_min   # przerywamy wyznaczanie dla tej pozycj
+                # jakikolwiek klocek nad nami
+        # przesuwamy sie o jedno w gore bo cos było na naszym poziomie
         if czy_tu_bylo:
             for c in new_piece:
                 c[1] -= 1
-                # print("ZOBACZ CZY ODJALEM Z TABLICY Y -1")
-                # print(new_piece)
-                # print(new_y)
+            y_min -= 1
+
         # pusta przestrzen pod klockiem
-        for cyco in new_piece:
-            if [cyco[0], cyco[1]+1] in game or [cyco[0], cyco[1]+1] in black_line:
+        for cy in new_piece:
+            if [cy[0], cy[1]+1] in game or [cy[0], cy[1]+1] in black_line:
                 czy_pod_nami_pusto = False
+
+        # pod nami wolne mozna isc nizej
         if czy_pod_nami_pusto:
             for c in new_piece:
                 c[1] += 1
-                # print("ZOBACZ CZY ODJALEM Z TABLICY Y +1")
-                # print(new_piece)
-                # print(new_y)
-    return tablica, new_piece, y_min
+            y_min += 1
+    else:
+        # pierwszy klocek, game jest puste
+        new_piece = []
+        y_max_piece = max(piece, key=lambda cos: cos[1])[1]
+        for coordinate in piece:
+            # tu musimy sprawdzic wysokosci y
+            new_x = coordinate[0]+1
+            new_y = coordinate[1] + 29 - y_max_piece
+            new_piece.append([new_x, new_y])
+
+    print(new_piece, "uwaga new piece!!!!!!")
+    print("MAŁA TABLICA:    ----------- ", mała_tablica)
+    return mała_tablica, new_piece, y_min
 
 
-def decision_function(piece, game, black_line, blue_line):
-    '''
-    piece - wspolrzedne klocka
-    game - zamalowane klocki
-    black line - współzedne graniczne klocków
-    typy ruchów: obrót, ruch w bok
+def count_points(new_piece, blue_line, black_line, points, game):
+    # wyznaczamy punkty
+        for coordinate in new_piece:
+            sasiady = [[coordinate[0]+1, coordinate[1]],
+                        [coordinate[0]-1, coordinate[1]],
+                        [coordinate[0], coordinate[1]+1]]
+            print("# Punktacja za koordynaty:", coordinate)
+            for s in sasiady:
+                if s in black_line:
+                    points += 6.0
+                    # print("6 pkt za black line")
+                elif s in blue_line:
+                    points += 4.0
+                    # print("4.0 pkt za blue line")
+                else:
+                    points += 1.0
+                    # print("1 pkt pozostałe")
+            y_table = [y for y in game if y[1] == coordinate[1]]
+            for c in new_piece:
+                if c[1] == coordinate[1]:
+                    y_table.append(c)
 
-    jak przesuwamy klocka
-    od lewej do prawej
-    punkty do tablicy i liczba przesunięc (kluczy)
-    znajdujemy najwyzej polozony y o danym x
-    sprawdzamy czy pozostałe wspołzedne klocka po przesunięciu mozna tam wpasowac
-    jak tak sprawdzamy jakie wspolzedne dotykają black line i liczymy pkt
-    kazdy polozony klocek to 1 * dlugosc / wysokosc
+            if len(y_table) == 8:
+                points += 15
 
-    dodajemy do tablicy punkty i liste kluczy: jezelu 4-x > 0 to tyle razy w prawo jezeli < 0 to tyle razy w lewo jezeli nic to w dół
-    '''
-    tablica = []
-    if piece is not None:
-        # lecimy po kolei wspolrzedne x
-        for x in range(1, 8):
-            print("-------------------> ## DECISION: ", x, "\n")
-            y_min = 100
-            y_max = 29
-            points = 0
-            new_piece = []
-            x_min = min(piece, key=lambda item: item[0])[0]
-            # print("min : ", x_min)
-            # tu mamy najlizszy pkt y dla wybranego x
-            # jak przesunac - znalesc najdalej wysuniety x jezeli x > 4 to przesuwamy w prawo x <
-            y_thre = max(piece, key=lambda item: item[1])[1]
-            basic_piece = coordinates(piece)
-            print("KLOCEK w 0;0 :", basic_piece, "\n")
+        print("Podsumowanie punktacji: ", points, "\n")
+        return points
 
-
-            tablica, new_piece, y_min = new_coordinates(basic_piece, game, x, tablica, new_piece, y_min, black_line)
-            print("NEW_PIECE : ", new_piece, "\n")
-            if len(tablica) != x:
-                # wyznaczamy punkty
-                for coordinate in new_piece:
-                    sasiady = [[coordinate[0]+1, coordinate[1]],
-                                [coordinate[0]-1, coordinate[1]],
-                                [coordinate[0], coordinate[1]+1]]
-                    print("# Punktacja za koordynaty:", coordinate)
-                    for s in sasiady:
-                        if s in blue_line and s in black_line:
-                            points += 6.0
-                            print("5 pkt za blue i black line")
-                        else:
-                            if s in black_line:
-                                points += 6.0
-                                print("6 pkt za black line")
-                            elif s in blue_line:
-                                points += 4.0
-                                print("4.0 pkt za blue line")
-                            else:
-                                points += 1.0
-                                print("1 pkt pozostałe")
-                    y_table = [y for y in game if y[1] == coordinate[1]]
-                    for c in new_piece:
-                        if c[1] == coordinate[1]:
-                            y_table.append(c)
-
-                    if len(y_table) == 8:
-                        points += 15
-
-                print("Podsumowanie punktacji: ", points, "\n")
-
-                keys = []
-                ile = abs(x - x_min)
-                print("?? ile roznicy - przesuniecia: ", ile, "??\n")
-                if x < x_min:
-                    for i in range(ile):
-                        keys.append("a")
-                elif x > x_min:
-                    for i in range(abs(ile)):
-                        keys.append("d")
-                print(keys)
-                # dodawanie do tablicy
-                tablica.append([points, keys, y_min])
-
-        sorted_table = sorted(tablica, reverse=True)
-        powtorzenia = sorted_table.count(sorted_table[0][0])
-        for i in range(powtorzenia):
-            if sorted_table[0][2] > sorted_table[i][2]:
-                sorted_table.pop(0)
-                print("wywaliłem gorsza opcje XDDDDDDDDDDDDDDDDD =================================")
-        print("RUCHY KLOCKA :", sorted_table, "\n")
-        return sorted_table[0][1]
-    return []
 
 def identify_block(state):
     # The aim of this function is to identify name of the falling block
@@ -291,12 +253,141 @@ def identify_block(state):
             print("[---BLOCK IDENTIFIED---]")
             return owning_shape
 
-def initiate_block_rotation(pass_shape, times):
-    # Having shave in Shape class we are able to rotate it
-    # Based on user passed 'times' parameter we decide how many times we will rotate
-    pass_shape.rotate(times)
-    print("ROTATED |x|y|", pass_shape)
-    return pass_shape.positions
+
+def indentyfi_keys(x, x_min, rotate):
+    keys = []
+    print("MIN X ====================================================== ", x_min)
+    ile = abs(x - x_min)
+    # print("?? ile roznicy - przesuniecia: ", ile, "??\n")
+    for i in range(rotate):
+        keys.append("w")
+    if x < x_min:
+        for i in range(ile):
+            keys.append("a")
+    elif x > x_min:
+        for i in range(abs(ile)):
+            keys.append("d")
+
+    return keys
+
+def decision_function(piece, game, black_line, blue_line, block):
+    '''
+    piece - wspolrzedne klocka
+    game - zamalowane klocki
+    black line - współzedne graniczne klocków
+    typy ruchów: obrót, ruch w bok
+
+    jak przesuwamy klocka
+    od lewej do prawej
+    punkty do tablicy i liczba przesunięc (kluczy)
+    znajdujemy najwyzej polozony y o danym x
+    sprawdzamy czy pozostałe wspołzedne klocka po przesunięciu mozna tam wpasowac
+    jak tak sprawdzamy jakie wspolzedne dotykają black line i liczymy pkt
+    kazdy polozony klocek to 1 * dlugosc / wysokosc
+
+    dodajemy do tablicy punkty i liste kluczy: jezelu 4-x > 0 to tyle razy w prawo jezeli < 0 to tyle razy w lewo jezeli nic to w dół
+    '''
+    tablica = []
+
+    if piece is not None:
+        # lecimy po kolei wspolrzedne x
+        for x in range(1, 9):
+            print("-------------------> ## DECISION: ", x, "\n")
+            # jak przesunac - znalesc najdalej wysuniety x jezeli x > 4 to przesuwamy w prawo x <
+            # y_thre = max(piece, key=lambda item: item[1])[1]
+            # x_min = min(rotated, key=lambda item: item[0])[0]
+
+            # Rotating a piece ang getting all it's possible positions (clockwise)
+            rotated_piece = copy.deepcopy(block)
+            table_positions = [piece]
+
+            for i in range(3):
+                rotated_piece.rotate(1)
+                table_positions.append(rotated_piece.positions)
+
+            rotate = 0
+            print(table_positions, "TABLE POSITIONS!!!!!!!!!")
+            mała_tablica = []  # tutaj wpisujemy 4 pozycje jednego klocka dla danego x
+
+            for rotated in table_positions:
+                print("-------------------> ## POSITIONS: ", rotate, "\n")
+                points = 0
+                basic_piece = coordinates(rotated)
+                print("OBROcony klocek: ", rotated)
+                print("KLOCEK w 0;0 :", basic_piece, "\n")
+                y_min = 100
+                x_min = min(rotated, key=lambda item: item[0])[0]  # niebezpieczne, cos moglo pojsc nie tak
+                # sprawdzenie najbardziej korzystnej pozycji
+                mała_tablica, new_piece, y_min = new_coordinates(basic_piece, game, x, y_min, black_line, mała_tablica)
+
+                print("NEW_PIECE : ", new_piece, "\n")
+                if len(mała_tablica) != rotate+1 and len(new_piece) == 4:
+                    points = count_points(new_piece, blue_line, black_line, points, game)
+                    keys = indentyfi_keys(x, x_min, rotate)
+                    print(new_piece, "dodaje do małej tablicy =============")
+                    print("punkt i klucze dla new piece: ", points, keys)
+                    mała_tablica.append([points, keys, y_min]) # dla kazdego z 4 rotacji klocka dodajemy do tablicy inf
+                rotate += 1
+
+            print("MAŁA TABLICA MUSI ZAWIERAC 4 ELEMENTY!!!!!!! ", len(mała_tablica))
+
+            sorted_small_table = sorted(mała_tablica, reverse=True)
+            best_option = sorted_small_table[0]
+            print("wszystkie mozliwe pozycje klocka: ", sorted_small_table)
+            tablica.append(best_option)
+            print("najlepsza pozycja klocka: ", best_option, "dla x: ", x)
+
+
+            # for rotated in table_positions:
+            #     print("-------------------> ## POSITIONS: ", rotate, "\n")
+            #     points = 0
+
+            #     print("rotate: ", rotate)
+            #     basic_piece = coordinates(rotated)
+            #     print("OBROcony klocek: ", rotated)
+            #     print("KLOCEK w 0;0 :", basic_piece, "\n")
+            #     # sprawdzenie najbardziej korzystnej pozycji
+            #     new_piece = []
+            #     mała_tablica, new_piece, y_min = new_coordinates(basic_piece, game, x, tablica, new_piece, y_min, black_line, mała_tablica)
+            #     # print("NEW_PIECE : ", new_piece, "\n")
+            #     print("NEW PIECEEEEEE: ", new_piece)
+
+            #     if len(mała_tablica) != rotate+1 and len(new_piece) == 4:
+            #         print(new_piece, "kurwz")
+            #         points = count_points(new_piece, blue_line, black_line, points, game)
+            #         keys = []
+            #         ile = abs(x - x_min)
+            #         # print("?? ile roznicy - przesuniecia: ", ile, "??\n")
+            #         if x < x_min:
+            #             for i in range(ile):
+            #                 keys.append("a")
+            #         elif x > x_min:
+            #             for i in range(abs(ile)):
+            #                 keys.append("d")
+            #         for i in range(rotate):
+            #             keys.append("w")
+
+            #         # dodawanie do tablicy
+            #         print(new_piece, "dodaje do małej tablicy =============")
+            #         print("punkt i klucze dla new piece: ", points, keys)
+            #         mała_tablica.append([points, keys, y_min])
+            #     rotate += 1
+            #     sorted_small_table = sorted(mała_tablica, reverse=True)
+            #     best_option = sorted_small_table[0]
+            #     # print("wszystkie mozliwe pozycje klocka: ", sorted_small_table)
+            #     tablica.append(best_option)
+            #     print("najlepsza pozycja klocka: ", best_option)
+
+        sorted_table = sorted(tablica, reverse=True)
+        powtorzenia = sorted_table.count(sorted_table[0][0])
+        for i in range(powtorzenia):
+            if sorted_table[0][2] > sorted_table[i][2]:
+                sorted_table.pop(0)
+        #         print("wywaliłem gorsza opcje XDDDDDDDDDDDDDDDDD =================================")
+        # print("RUCHY KLOCKA :", sorted_table, "\n")
+        return sorted_table[0][1]
+    return []
+
 
 def play(state, keys, is_new_piece):
     key = ""
@@ -307,12 +398,12 @@ def play(state, keys, is_new_piece):
     if state["piece"] is not None and is_new_piece == True:
         print("## IDENTIFYING BLOCK & ROTATION...")
         block = identify_block(state)
-        initiate_block_rotation(block, times=1)
+        # print(initiate_block_rotation(block, times=3))
         print("## FINISH IDENTIFYING!\n\n")
         print("## BLACK LINE")
         print(current_black_line)
         print("## END OF BLACK LINE\n\n")
-        keys = decision_function(state["piece"], state["game"], current_black_line, current_blue_line)
+        keys = decision_function(state["piece"], state["game"], current_black_line, current_blue_line, block)
         print("KEYS", keys)
         is_new_piece = False
 
